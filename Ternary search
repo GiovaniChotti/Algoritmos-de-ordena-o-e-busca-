@@ -1,0 +1,51 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Função para realizar a busca ternária
+int ternarySearch(const vector<int>& arr, int left, int right, int key) {
+    // Enquanto a busca não acabar
+    while (right >= left) {
+        // Calcula as posições dos dois pontos médios
+        int mid1 = left + (right - left) / 3;
+        int mid2 = right - (right - left) / 3;
+
+        // Verifica se o elemento é encontrado em um dos pontos médios
+        if (arr[mid1] == key) {
+            return mid1;
+        }
+        if (arr[mid2] == key) {
+            return mid2;
+        }
+
+        // Decide qual parte do vetor buscar
+        if (key < arr[mid1]) {
+            right = mid1 - 1; // Busca na primeira parte
+        } else if (key > arr[mid2]) {
+            left = mid2 + 1; // Busca na terceira parte
+        } else {
+            left = mid1 + 1; // Busca entre os dois pontos médios
+            right = mid2 - 1;
+        }
+    }
+
+    // Se o elemento não for encontrado
+    return -1;
+}
+
+int main() {
+    vector<int> arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; // Vetor de exemplo
+    int key = 7;  // Elemento a ser encontrado
+
+    // Realiza a busca ternária
+    int result = ternarySearch(arr, 0, arr.size() - 1, key);
+
+    // Exibe o resultado da busca
+    if (result != -1) {
+        cout << "Elemento encontrado no índice: " << result << endl;
+    } else {
+        cout << "Elemento não encontrado." << endl;
+    }
+
+    return 0;
+}
