@@ -1,0 +1,50 @@
+#include <iostream>
+using namespace std;
+
+int interpolationSearch(const int* arr, int size, int target) {
+    int left = 0, right = size - 1;
+
+    while (left <= right && target >= arr[left] && target <= arr[right]) {
+        if (left == right) {
+            return (arr[left] == target) ? left : -1;
+        }
+
+        int pos = left + ((target - arr[left]) * (right - left)) / (arr[right] - arr[left]);
+
+        if (arr[pos] == target) {
+            return pos;
+        } else if (arr[pos] < target) {
+            left = pos + 1; // Busca à direita
+        } else {
+            right = pos - 1; // Busca à esquerda
+        }
+    }
+
+    return -1;
+}
+
+int main() {
+    const int uniformArr[] = {10, 20, 30, 40, 50};
+    const int uniformSize = sizeof(uniformArr) / sizeof(uniformArr[0]);
+    const int uniformTarget = 40;
+
+    const int nonUniformArr[] = {3, 6, 8, 12, 15, 25, 50};
+    const int nonUniformSize = sizeof(nonUniformArr) / sizeof(nonUniformArr[0]);
+    const int nonUniformTarget = 25;
+
+    const int resultUniform = interpolationSearch(uniformArr, uniformSize, uniformTarget);
+    if (resultUniform != -1) {
+        cout << "Elemento " << uniformTarget << " encontrado no índice " << resultUniform << " (Lista Uniforme)" << endl;
+    } else {
+        cout << "Elemento " << uniformTarget << " não encontrado (Lista Uniforme)" << endl;
+    }
+
+    const int resultNonUniform = interpolationSearch(nonUniformArr, nonUniformSize, nonUniformTarget);
+    if (resultNonUniform != -1) {
+        cout << "Elemento " << nonUniformTarget << " encontrado no índice " << resultNonUniform << " (Lista Não Uniforme)" << endl;
+    } else {
+        cout << "Elemento " << nonUniformTarget << " não encontrado (Lista Não Uniforme)" << endl;
+    }
+
+    return 0;
+}
