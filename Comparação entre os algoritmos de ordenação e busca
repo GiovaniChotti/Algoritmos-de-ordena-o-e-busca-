@@ -1,0 +1,231 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <chrono>
+
+using namespace std;
+using namespace chrono;
+
+// Função para imprimir o vetor
+void printArray(const vector<int>& arr) {
+    for (int num : arr) {
+        cout << num << " ";
+    }
+    cout << endl;
+}
+
+//--------------------- Shell Sort ---------------------
+int shellComparisons = 0;
+
+void shellSort(vector<int>& arr) {
+    int n = arr.size();
+    for (int gap = n / 2; gap > 0; gap /= 2) {
+        for (int i = gap; i < n; i++) {
+            int temp = arr[i];
+            int j;
+            for (j = i; j >= gap && arr[j - gap] > temp; j -= gap) {
+                arr[j] = arr[j - gap];
+                shellComparisons++;
+            }
+            arr[j] = temp;
+        }
+    }
+}
+
+//--------------------- Merge Sort ---------------------
+int mergeComparisons = 0;
+
+void merge(vector<int>& arr, int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+    vector<int> L(n1), R(n2);
+
+    copy(arr.begin() + left, arr.begin() + left + n1, L.begin());
+    copy(arr.begin() + mid + 1, arr.begin() + mid + 1 + n2, R.begin());
+
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+        mergeComparisons++;
+    }
+
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+void mergeSort(vector<int>& arr, int left, int right) {
+    if (left >= right) return;
+
+    int mid = left + (right - left) / 2;
+    mergeSort(arr, left, mid);
+    mergeSort(arr, mid + 1, right);
+    merge(arr, left, mid, right);
+}
+
+//--------------------- Selection Sort ---------------------
+int selectionComparisons = 0;
+
+void selectionSort(vector<int>& arr) {
+    int n = arr.size();
+    for (int i = 0; i < n - 1; i++) {
+        int minIdx = i;
+        for (int j = i + 1; j < n; j++) {
+            selectionComparisons++;
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j;
+            }
+        }
+        swap(arr[i], arr[minIdx]);
+    }
+}
+
+//--------------------- Quick Sort ---------------------
+int quickComparisons = 0;
+
+int partition(vector<int>& arr, int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j <= high - 1; j++) {
+        quickComparisons++;
+        if (arr[j] <= pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return (i + 1);
+}
+
+void quickSort(vector<int>& arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+//--------------------- Bucket Sort ---------------------
+int bucketComparisons = 0;
+
+void bucketSort(vector<int>& arr) {
+    int n = arr.size();
+    if (n <= 1) return;
+
+    float minVal = *min_element(arr.begin(), arr.end());
+    float maxVal = *max_element(arr.begin(), arr.end());
+    int bucketCount = n;
+    vector<vector<int>> buckets(bucketCount);
+
+    float range = (maxVal - minVal) / bucketCount;
+
+    for (int i = 0; i < n; i++) {
+        int bucketIdx = (arr[i] - minVal) / range;
+        if (bucketIdx == bucketCount) bucketIdx--;
+        buckets[bucketIdx].push_back(arr[i]);
+    }
+
+    for (int i = 0; i < bucketCount; i++) {
+        sort(buckets[i].begin(), buckets[i].end());
+        bucketComparisons += buckets[i].size();
+    }
+
+    int idx = 0;
+    for (int i = 0; i < bucketCount; i++) {
+        for (int num : buckets[i]) {
+            arr[idx++] = num;
+        }
+    }
+}
+
+//--------------------- Radix Sort ---------------------
+int radixComparisons = 0;
+
+void countingSortByDigit(vector<int>& arr, int exp) {
+    int n = arr.size();
+    vector<int> output(n);
+    int count[10] = {0};
+
+    for (int i = 0; i < n; i++) {
+        count[(arr[i] / exp) % 10]++;
+    }
+
+    for (int i = 1; i < 10; i++) {
+        count[i] += count[i - 1];
+    }
+
+    for (int i = n - 1; i >= 0; i--) {
+        int digit = (arr[i] / exp) % 10;
+        output[count[digit] - 1] = arr[i];
+        count[digit]--;
+    }
+
+    for (int i = 0; i < n; i++) {
+        arr[i] = output[i];
+    }
+}
+
+void radixSort(vector<int>& arr) {
+    int maxElement = *max_element(arr.begin(), arr.end());
+
+    for (int exp = 1; maxElement / exp > 0; exp *= 10) {
+        countingSortByDigit(arr, exp);
+    }
+}
+
+//--------------------- Função principal ---------------------
+void sortAndMeasure(vector<int>& arr, const string& sortType) {
+    auto start = high_resolution_clock::now();
+    if (sortType == "Shell") {
+        shellSort(arr);
+    } else if (sortType == "Merge") {
+        mergeSort(arr, 0, arr.size() - 1);
+    } else if (sortType == "Selection") {
+        selectionSort(arr);
+    } else if (sortType == "Quick") {
+        quickSort(arr, 0, arr.size() - 1);
+    } else if (sortType == "Bucket") {
+        bucketSort(arr);
+    } else if (sortType == "Radix") {
+        radixSort(arr);
+    }
+    auto end = high_resolution_clock::now();
+    cout << sortType << " Sort: ";
+    printArray(arr);
+    cout << "Comparações: " << (sortType == "Shell" ? shellComparisons :
+                               sortType == "Merge" ? mergeComparisons :
+                               sortType == "Selection" ? selectionComparisons :
+                               sortType == "Quick" ? quickComparisons :
+                               sortType == "Bucket" ? bucketComparisons :
+                               radixComparisons) << endl;
+    cout << "Tempo: " << duration_cast<microseconds>(end - start).count() << " microsegundos" << endl;
+}
+
+int main() {
+    vector<int> arr = {37, 23, 0, 17, 12, 72, 31, 46, 100, 88};
+
+    sortAndMeasure(arr, "Shell");
+    sortAndMeasure(arr, "Merge");
+    sortAndMeasure(arr, "Selection");
+    sortAndMeasure(arr, "Quick");
+    sortAndMeasure(arr, "Bucket");
+    sortAndMeasure(arr, "Radix");
+
+    return 0;
+}
