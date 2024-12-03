@@ -1,0 +1,105 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// Função de troca
+void swap(int& a, int& b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+// Partição usando o primeiro elemento como pivô
+int partitionFirst(vector<int>& arr, int low, int high) {
+    int pivot = arr[low];
+    int left = low + 1;
+    int right = high;
+
+    while (left <= right) {
+        // Move left para a direita até encontrar um elemento maior que o pivô
+        while (left <= right && arr[left] <= pivot)
+            left++;
+        // Move right para a esquerda até encontrar um elemento menor que o pivô
+        while (left <= right && arr[right] > pivot)
+            right--;
+        
+        // Se left for menor que right, troque os elementos
+        if (left < right)
+            swap(arr[left], arr[right]);
+    }
+    
+    // Coloca o pivô na posição correta
+    swap(arr[low], arr[right]);
+    return right;
+}
+
+// Partição usando o último elemento como pivô
+int partitionLast(vector<int>& arr, int low, int high) {
+    int pivot = arr[high];
+    int left = low;
+    int right = high - 1;
+
+    while (left <= right) {
+        while (left <= right && arr[left] <= pivot)
+            left++;
+        while (left <= right && arr[right] > pivot)
+            right--;
+        
+        if (left < right)
+            swap(arr[left], arr[right]);
+    }
+    swap(arr[high], arr[left]);
+    return left;
+}
+
+// Partição usando o elemento do meio como pivô
+int partitionMiddle(vector<int>& arr, int low, int high) {
+    int mid = low + (high - low) / 2;
+    swap(arr[mid], arr[low]);  // Troca o meio com o início para usar o meio como pivô
+    return partitionFirst(arr, low, high); // Depois usa o método de partição com o primeiro como pivô
+}
+
+// Função QuickSort com critério de escolha de pivô
+void quickSort(vector<int>& arr, int low, int high, int criterion) {
+    if (low < high) {
+        int pivotIndex;
+
+        // Escolhe o critério de partição conforme a entrada do usuário
+        if (criterion == 1)
+            pivotIndex = partitionFirst(arr, low, high);
+        else if (criterion == 2)
+            pivotIndex = partitionLast(arr, low, high);
+        else
+            pivotIndex = partitionMiddle(arr, low, high);
+
+        // Recursão para ordenar as duas metades
+        quickSort(arr, low, pivotIndex - 1, criterion);
+        quickSort(arr, pivotIndex + 1, high, criterion);
+    }
+}
+
+// Função para imprimir o vetor
+void printArray(const vector<int>& arr) {
+    for (int num : arr)
+        cout << num << " ";
+    cout << endl;
+}
+
+int main() {
+    vector<int> arr = {34, 7, 23, 32, 5, 62};
+    int criterion;
+
+    // Solicita ao usuário o critério de pivô
+    cout << "Escolha o critério para o pivô: 1 (primeiro), 2 (último), 3 (meio): ";
+    cin >> criterion;
+
+    // Chama o algoritmo de QuickSort
+    quickSort(arr, 0, arr.size() - 1, criterion);
+
+    // Exibe o vetor ordenado
+    cout << "Array ordenado: ";
+    printArray(arr);
+
+    return 0;
+}
