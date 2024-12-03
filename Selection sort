@@ -1,0 +1,53 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Função para realizar o algoritmo de Selection Sort
+void selectionSort(vector<int>& arr) {
+    int n = arr.size();
+
+    for (int i = 0; i < n - 1; i++) {
+        int minIndex = i;
+
+        // Encontra o índice do menor elemento no subarray não ordenado
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIndex]) {
+                minIndex = j;
+            }
+        }
+
+        // Troca o menor elemento encontrado com o primeiro elemento do subarray não ordenado
+        if (minIndex != i) {
+            swap(arr[i], arr[minIndex]);
+        }
+
+        // Exibe o estado do vetor após cada iteração
+        cout << "Iteração " << i + 1 << ": ";
+        for (int num : arr) {
+            cout << num << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Função para exibir os elementos do vetor
+void printArray(const vector<int>& arr) {
+    for (int num : arr) {
+        cout << num << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    vector<int> arr = {64, 25, 12, 22, 11};
+
+    cout << "Vetor original: ";
+    printArray(arr);
+
+    selectionSort(arr);
+
+    cout << "Vetor ordenado: ";
+    printArray(arr);
+
+    return 0;
+}
